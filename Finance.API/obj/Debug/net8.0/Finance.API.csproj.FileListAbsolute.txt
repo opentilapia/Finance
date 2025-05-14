@@ -75,3 +75,4 @@ C:\Users\geral\source\repos\Finance\Finance.API\obj\Debug\net8.0\refint\Finance.
 C:\Users\geral\source\repos\Finance\Finance.API\obj\Debug\net8.0\Finance.API.pdb
 C:\Users\geral\source\repos\Finance\Finance.API\obj\Debug\net8.0\Finance.API.genruntimeconfig.cache
 C:\Users\geral\source\repos\Finance\Finance.API\obj\Debug\net8.0\ref\Finance.API.dll
+C:\Users\geral\source\repos\Finance\Finance.API\obj\Debug\net8.0\Finance.API.sourcelink.json
