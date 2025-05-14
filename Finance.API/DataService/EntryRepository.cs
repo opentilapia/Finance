@@ -3,16 +3,16 @@ using Finance.API.Model;
 using Finance.API.DataService.Interface;
 using MongoDB.Bson;
 
-using CurrentClass = Finance.API.Model.Category;
+using CurrentClass = Finance.API.Model.Entry;
 
 namespace Finance.API.DataService
 {
-    public class CategoryRepository : BaseRepository, ICategoryRepository
+    public class EntryRepository : BaseRepository, IEntryRepository
     {
-        const string COLLECTION_NAME = "category";
+        const string COLLECTION_NAME = "entry";
         readonly IMongoCollection<CurrentClass> _collection;
 
-        public CategoryRepository(IMongoDatabase db)
+        public EntryRepository(IMongoDatabase db)
         {
             _collection = db.GetCollection<CurrentClass>(COLLECTION_NAME);
         }
@@ -25,19 +25,16 @@ namespace Finance.API.DataService
                 .Find(filter)
                 .FirstOrDefaultAsync();
         }
-        public async Task<List<CurrentClass>> GetAll()
+        public async Task<List<CurrentClass>> GetPaginated(int pageSize, DateTime lastEntryDate)
         {
-            var filter = Builders<CurrentClass>.Filter.Empty;
+            var filter = Builders<CurrentClass>.Filter.Gte(s => s.EntryDate, lastEntryDate);
+            var sort = Builders<CurrentClass>.Sort.Descending(s => s.EntryDate);
 
             return await _collection
                 .Find(filter)
+                .Sort(sort)
+                .Limit(pageSize)
                 .ToListAsync();
-        }
-
-        public async Task<bool> IsExistById(string id)
-        {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, ToObjectId(id));
-            return await _collection.CountDocumentsAsync(filter) > 0;
         }
 
         public async Task<bool> Upsert(CurrentClass entity)
@@ -47,8 +44,10 @@ namespace Finance.API.DataService
             DateTime currDate = DateTime.Now;
 
             var update = Builders<CurrentClass>.Update
-                .Set(s => s.CategoryName, entity.CategoryName)
-                .Set(s => s.ColorCoding, entity.ColorCoding)
+                .Set(s => s.EntryDate, entity.EntryDate)
+                .Set(s => s.Description, entity.Description)
+                .Set(s => s.Remarks, entity.Remarks)
+                .Set(s => s.CategoryId, entity.CategoryId)
                 .Set(s => s.LastUpdatedDate, currDate)
                 .SetOnInsert(s => s.CreatedDate, currDate);
 

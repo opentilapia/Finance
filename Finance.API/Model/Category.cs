@@ -11,7 +11,7 @@ namespace Finance.API.Model
 
         }
 
-        public Category(CreateCategoryRequestVM request) 
+        public Category(UpsertCategoryRequestVM request) 
         { 
             CategoryName = request.CategoryName;
             ColorCoding = request.ColorCoding;

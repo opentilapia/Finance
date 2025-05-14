@@ -8,40 +8,40 @@ namespace Finance.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CategoryController : BaseController
+    public class EntryController : BaseController
     {
-        private readonly ICategoryService _service;
+        private readonly IEntryService _service;
 
-        public CategoryController(ICategoryService service)
+        public EntryController(IEntryService service)
         {
             _service = service;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateCategory([FromBody] UpsertCategoryRequestVM request)
+        public async Task<IActionResult> CreateOrUpdateEntry([FromBody] UpsertEntryRequestVM request)
         {
             bool result = await _service.Upsert(request);
             return SendSuccess(result);
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllCategories()
+        [HttpGet("paginate")]
+        public async Task<IActionResult> GetByPagination(DateTime? lastEntryDate)
         {
-            var result = await _service.GetAll();
+            var result = await _service.GetPaginated(lastEntryDate);
             return SendSuccess(result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategoryById(string id)
+        public async Task<IActionResult> DeleteById(string id)
         {
-            var result = await _service.GetById(id);
+            var result = await _service.Delete(id);
             return SendSuccess(result);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteCategory(string id)
+        public async Task<IActionResult> GetById(string id)
         {
-            var result = await _service.Delete(id);
+            var result = await _service.GetById(id);
             return SendSuccess(result);
         }
     }

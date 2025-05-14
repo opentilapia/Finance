@@ -2,6 +2,7 @@
 using Finance.API.Model;
 using Finance.API.Service.Interface;
 using Finance.API.ViewModel;
+using Finance.API.ViewModel.Request;
 
 namespace Finance.API.Service
 {
@@ -14,21 +15,42 @@ namespace Finance.API.Service
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<bool> CreateCategory(Category entity)
+        public async Task<bool> Upsert(UpsertCategoryRequestVM request)
         {
+            Category entity = new Category(request);
             entity.CreatedDate = DateTime.Now;
 
-            return await _categoryRepo.Insert(entity);
+            return await _categoryRepo.Upsert(entity);
         }
 
-        public async Task<Category> GetCategoryById(string id)
+        public async Task<CategoryVM> GetById(string id)
         {
-            return await _categoryRepo.GetById(id);
+            Category entity = await _categoryRepo.GetById(id);
+
+            if (entity == null)
+            {
+                throw new ApplicationException("Not found");
+            }
+
+            return new CategoryVM(entity);
         }
 
-        public async Task<List<Category>> GetAllCategories()
+        public async Task<List<CategoryVM>> GetAll()
         {
-            return await _categoryRepo.GetAll();
+            List<Category> sources = await _categoryRepo.GetAll();
+            List<CategoryVM> result = new List<CategoryVM>();
+
+            foreach (Category category in sources)
+            {
+                result.Add(new CategoryVM(category));
+            }
+
+            return result;
+        }
+
+        public async Task<bool> Delete(string id)
+        {
+            return await _categoryRepo.Delete(id);
         }
     }
 }

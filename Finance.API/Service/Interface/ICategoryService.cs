@@ -1,13 +1,17 @@
 ﻿using Finance.API.Model;
+using Finance.API.ViewModel;
+using Finance.API.ViewModel.Request;
 
 namespace Finance.API.Service.Interface
 {
     public interface ICategoryService
     {
-        Task<bool> CreateCategory(Category entity);
+        Task<bool> Upsert(UpsertCategoryRequestVM entity);
 
-        Task<Category> GetCategoryById(string categoryId);
+        Task<CategoryVM> GetById(string categoryId);
 
-        Task<List<Category>> GetAllCategories();
+        Task<List<CategoryVM>> GetAll();
+
+        Task<bool> Delete(string id);
     }
 }
