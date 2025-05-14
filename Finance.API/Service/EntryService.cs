@@ -21,8 +21,8 @@ namespace Finance.API.Service
 
         public async Task<bool> Upsert(UpsertEntryRequestVM request)
         {
-            if (!request.Id.IsNullOrEmpty() && 
-                !request.CategoryId.IsNullOrEmpty())
+            if (request.Id.IsNullOrEmpty() && 
+                request.CategoryId.IsNullOrEmpty())
             {
                 throw new ApplicationException("Category ID cannot be empty when creating entry.");
             }

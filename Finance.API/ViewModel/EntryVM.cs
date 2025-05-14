@@ -7,20 +7,18 @@ namespace Finance.API.ViewModel
         public EntryVM(Entry entity) 
         { 
             Id = entity.Id.ToString();
-            Description = entity.Description;
             EntryDate = entity.EntryDate;
+            Amount = entity.Amount;
+            Description = entity.Description;
             Remarks = entity.Remarks;
             CategoryId = entity.CategoryId.ToString();
         }
 
         public string Id { get; set; }
-
-        public string Description { get; set; }
-
         public DateTime EntryDate { get; set; }
-
+        public decimal Amount { get; set; }
+        public string Description { get; set; }
         public string Remarks { get; set; }
-
         public string CategoryId { get; set; }
     }
 }

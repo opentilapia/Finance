@@ -20,29 +20,57 @@ namespace Finance.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrUpdateCategory([FromBody] UpsertCategoryRequestVM request)
         {
-            bool result = await _service.Upsert(request);
-            return SendSuccess(result);
+            try
+            {
+                bool result = await _service.Upsert(request);
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
         }
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllCategories()
         {
-            var result = await _service.GetAll();
-            return SendSuccess(result);
+            try
+            {
+                var result = await _service.GetAll();
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCategoryById(string id)
         {
-            var result = await _service.GetById(id);
-            return SendSuccess(result);
+            try
+            {
+                var result = await _service.GetById(id);
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCategory(string id)
         {
-            var result = await _service.Delete(id);
-            return SendSuccess(result);
+            try
+            {
+                var result = await _service.Delete(id);
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
         }
     }
 }

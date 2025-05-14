@@ -8,5 +8,16 @@ namespace Finance.API.Controllers
         {
             return Ok(response);
         }
+
+        public IActionResult SendError(Exception e)
+        {
+            var errorResponse = new
+            {
+                message = "An error has occured",
+                details = e.Message
+            };
+            return StatusCode(500, errorResponse);
+        }
+
     }
 }

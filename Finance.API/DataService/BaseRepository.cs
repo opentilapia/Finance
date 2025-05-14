@@ -16,4 +16,10 @@ public class BaseRepository
 
         return null;
     }
+
+    protected virtual string GetPKId()
+    {
+        return ObjectId.GenerateNewId()
+            .ToString();
+    }
 }

@@ -19,7 +19,8 @@ namespace Finance.API.Model
         }
 
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
         public string CategoryName { get; set; }
 

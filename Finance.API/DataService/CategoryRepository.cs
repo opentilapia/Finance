@@ -1,8 +1,5 @@
-﻿using MongoDB.Driver;
-using Finance.API.Model;
-using Finance.API.DataService.Interface;
-using MongoDB.Bson;
-
+﻿using Finance.API.DataService.Interface;
+using MongoDB.Driver;
 using CurrentClass = Finance.API.Model.Category;
 
 namespace Finance.API.DataService
@@ -19,7 +16,7 @@ namespace Finance.API.DataService
 
         public async Task<CurrentClass> GetById(string id)
         {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, ToObjectId(id));
+            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
 
             return await _collection
                 .Find(filter)
@@ -36,12 +33,17 @@ namespace Finance.API.DataService
 
         public async Task<bool> IsExistById(string id)
         {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, ToObjectId(id));
+            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
             return await _collection.CountDocumentsAsync(filter) > 0;
         }
 
         public async Task<bool> Upsert(CurrentClass entity)
         {
+            if (entity.Id == null)
+            {
+                entity.Id = GetPKId();
+            }
+
             var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, entity.Id);
 
             DateTime currDate = DateTime.Now;
@@ -63,7 +65,7 @@ namespace Finance.API.DataService
 
         public async Task<bool> Delete(string id)
         {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, ToObjectId(id));
+            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
             await _collection.DeleteOneAsync(filter);
 
             return true;

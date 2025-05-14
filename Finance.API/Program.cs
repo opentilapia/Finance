@@ -22,6 +22,8 @@ namespace ExpenseTracker.API
 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IEntryService, EntrySevice>();
+            builder.Services.AddScoped<IEntryRepository, EntryRepository>();
 
             // Configure MongoDBSettings from appsettings.json
             builder.Services.Configure<MongoDBSettings>(
