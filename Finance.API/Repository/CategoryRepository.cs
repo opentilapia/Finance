@@ -1,17 +1,16 @@
 ﻿using Finance.API.DataService.Interface;
 using MongoDB.Driver;
-using CurrentClass = Finance.API.Model.Category;
+using CurrentClass = Finance.API.Domain.Class.Category;
 
 namespace Finance.API.DataService
 {
-    public class CategoryRepository : BaseRepository, ICategoryRepository
+    public class CategoryRepository : BaseMongoDbRepository<CurrentClass>, ICategoryRepository
     {
-        const string COLLECTION_NAME = "category";
-        readonly IMongoCollection<CurrentClass> _collection;
+        private const string COLLECTION_NAME = "category";
 
         public CategoryRepository(IMongoDatabase db)
+            : base(db, COLLECTION_NAME)
         {
-            _collection = db.GetCollection<CurrentClass>(COLLECTION_NAME);
         }
 
         public async Task<CurrentClass> GetById(string id)
@@ -34,15 +33,13 @@ namespace Finance.API.DataService
         public async Task<bool> IsExistById(string id)
         {
             var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
-            return await _collection.CountDocumentsAsync(filter) > 0;
+            return await IsExist(filter);
         }
 
         public async Task<bool> Upsert(CurrentClass entity)
         {
             if (entity.Id == null)
-            {
                 entity.Id = GetPKId();
-            }
 
             var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, entity.Id);
 
@@ -50,6 +47,7 @@ namespace Finance.API.DataService
 
             var update = Builders<CurrentClass>.Update
                 .Set(s => s.CategoryName, entity.CategoryName)
+                .Set(s => s.Action, entity.Action)
                 .Set(s => s.ColorCoding, entity.ColorCoding)
                 .Set(s => s.LastUpdatedDate, currDate)
                 .SetOnInsert(s => s.CreatedDate, currDate);

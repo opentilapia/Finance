@@ -1,17 +1,16 @@
 ﻿using Finance.API.DataService.Interface;
 using MongoDB.Driver;
-using CurrentClass = Finance.API.Model.Entry;
+using CurrentClass = Finance.API.Domain.Class.Entry;
 
 namespace Finance.API.DataService
 {
-    public class EntryRepository : BaseRepository, IEntryRepository
+    public class EntryRepository : BaseMongoDbRepository<CurrentClass>, IEntryRepository
     {
-        const string COLLECTION_NAME = "entry";
-        readonly IMongoCollection<CurrentClass> _collection;
+        private const string COLLECTION_NAME = "entry";
 
-        public EntryRepository(IMongoDatabase db)
+        public EntryRepository(IMongoDatabase db) 
+            :base(db, COLLECTION_NAME)
         {
-            _collection = db.GetCollection<CurrentClass>(COLLECTION_NAME);
         }
 
         public async Task<CurrentClass> GetById(string id)
@@ -37,9 +36,7 @@ namespace Finance.API.DataService
         public async Task<bool> Upsert(CurrentClass entity)
         {
             if (entity.Id == null)
-            {
                 entity.Id = GetPKId();
-            }
 
             var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, entity.Id);
 

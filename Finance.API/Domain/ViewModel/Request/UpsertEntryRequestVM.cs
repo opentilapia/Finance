@@ -1,4 +1,4 @@
-﻿namespace Finance.API.ViewModel.Request
+﻿namespace Finance.API.Domain.ViewModel.Request
 {
     public class UpsertEntryRequestVM
     {

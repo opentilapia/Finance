@@ -1,6 +1,7 @@
 ﻿namespace Finance.API.DataService.Interface
 {
-    public interface IRepository<T>
+    public interface IBaseRepository
     {
+        string GetPKId();
     }
 }

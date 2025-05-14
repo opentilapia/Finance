@@ -1,18 +1,19 @@
-﻿using Finance.API.ViewModel.Request;
+﻿using Finance.API.Domain.Enum;
+using Finance.API.Domain.ViewModel.Request;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Finance.API.Model
+namespace Finance.API.Domain.Class
 {
     public class Category
     {
-        public Category() 
-        { 
+        public Category()
+        {
 
         }
 
-        public Category(UpsertCategoryRequestVM request) 
-        { 
+        public Category(UpsertCategoryRequestVM request)
+        {
             CategoryName = request.CategoryName;
             ColorCoding = request.ColorCoding;
             CreatedDate = DateTime.Now;
@@ -25,6 +26,8 @@ namespace Finance.API.Model
         public string CategoryName { get; set; }
 
         public string ColorCoding { get; set; }
+        
+        public CategoryActionEnum Action { get; set; }
 
         public DateTime CreatedDate { get; set; }
 

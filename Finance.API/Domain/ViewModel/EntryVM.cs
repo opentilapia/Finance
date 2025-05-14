@@ -1,11 +1,11 @@
-﻿using Finance.API.Model;
+﻿using Finance.API.Domain.Class;
 
-namespace Finance.API.ViewModel
+namespace Finance.API.Domain.ViewModel
 {
     public class EntryVM
     {
-        public EntryVM(Entry entity) 
-        { 
+        public EntryVM(Entry entity)
+        {
             Id = entity.Id.ToString();
             EntryDate = entity.EntryDate;
             Amount = entity.Amount;

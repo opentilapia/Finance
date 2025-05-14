@@ -1,8 +1,8 @@
-﻿using Finance.API.ViewModel.Request;
+﻿using Finance.API.Domain.ViewModel.Request;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Finance.API.Model
+namespace Finance.API.Domain.Class
 {
     public class Entry
     {
@@ -12,7 +12,7 @@ namespace Finance.API.Model
             Amount = request.Amount;
             Description = request.Description;
             Remarks = request.Remarks;
-            
+
             ObjectId.TryParse(request.CategoryId, out ObjectId categoryId);
             CategoryId = categoryId;
         }
@@ -22,9 +22,9 @@ namespace Finance.API.Model
         public string Id { get; set; }
         public DateTime EntryDate { get; set; }
         public decimal Amount { get; set; }
-        public string Description {get;set;}
-        public string Remarks {get;set;}
-        public ObjectId CategoryId {get;set;}
+        public string Description { get; set; }
+        public string Remarks { get; set; }
+        public ObjectId CategoryId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastUpdatedDate { get; set; }
     }

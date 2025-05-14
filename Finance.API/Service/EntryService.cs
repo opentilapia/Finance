@@ -1,15 +1,15 @@
 ﻿using Finance.API.DataService.Interface;
-using Finance.API.Model;
+using Finance.API.Domain.Class;
+using Finance.API.Domain.ViewModel;
+using Finance.API.Domain.ViewModel.Request;
 using Finance.API.Service.Interface;
-using Finance.API.ViewModel;
-using Finance.API.ViewModel.Request;
 
 namespace Finance.API.Service
 {
     public class EntrySevice : IEntryService
     {
-        readonly IEntryRepository _repo;
-        readonly ICategoryRepository _categoryRepo;
+        private readonly IEntryRepository _repo;
+        private readonly ICategoryRepository _categoryRepo;
 
         const int PAGE_SIZE = 10;
 

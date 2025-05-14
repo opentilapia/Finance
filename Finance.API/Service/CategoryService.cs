@@ -1,8 +1,8 @@
 ﻿using Finance.API.DataService.Interface;
-using Finance.API.Model;
+using Finance.API.Domain.Class;
+using Finance.API.Domain.ViewModel;
+using Finance.API.Domain.ViewModel.Request;
 using Finance.API.Service.Interface;
-using Finance.API.ViewModel;
-using Finance.API.ViewModel.Request;
 
 namespace Finance.API.Service
 {

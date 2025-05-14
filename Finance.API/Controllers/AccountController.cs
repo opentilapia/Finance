@@ -6,19 +6,17 @@ namespace Finance.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EntryController : BaseController
+    public class AccountController : BaseController
     {
-        private readonly IEntryService _service;
-        private readonly ICategoryService _categoryService;
+        private readonly IAccountService _service;
 
-        public EntryController(IEntryService service, ICategoryService categoryService)
+        public AccountController(IAccountService service)
         {
             _service = service;
-            _categoryService = categoryService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upsert([FromBody] UpsertEntryRequestVM request)
+        public async Task<IActionResult> Upsert([FromBody] UpsertAccountRequestVM request)
         {
             try
             {
@@ -31,12 +29,12 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpGet("paginate")]
-        public async Task<IActionResult> GetPaginated(DateTime? lastEntryDate)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _service.GetPaginated(lastEntryDate);
+                var result = await _service.GetAll();
                 return SendSuccess(result);
             }
             catch (Exception e)
@@ -46,11 +44,11 @@ namespace Finance.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> GetById(string id)
         {
             try
             {
-                var result = await _service.Delete(id);
+                var result = await _service.GetById(id);
                 return SendSuccess(result);
             }
             catch (Exception e)
@@ -60,11 +58,11 @@ namespace Finance.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
-                var result = await _service.GetById(id);
+                var result = await _service.Delete(id);
                 return SendSuccess(result);
             }
             catch (Exception e)

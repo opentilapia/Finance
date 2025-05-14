@@ -1,7 +1,5 @@
-﻿using Finance.API.Model;
+﻿using Finance.API.Domain.ViewModel.Request;
 using Finance.API.Service.Interface;
-using Finance.API.ViewModel;
-using Finance.API.ViewModel.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finance.API.Controllers
@@ -18,7 +16,7 @@ namespace Finance.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrUpdateCategory([FromBody] UpsertCategoryRequestVM request)
+        public async Task<IActionResult> Upsert([FromBody] UpsertCategoryRequestVM request)
         {
             try
             {
@@ -32,7 +30,7 @@ namespace Finance.API.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllCategories()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
@@ -46,7 +44,7 @@ namespace Finance.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCategoryById(string id)
+        public async Task<IActionResult> GetById(string id)
         {
             try
             {
@@ -60,7 +58,7 @@ namespace Finance.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteCategory(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {

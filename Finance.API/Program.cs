@@ -5,7 +5,7 @@ using Finance.API.Service.Interface;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace ExpenseTracker.API
+namespace Finance.API
 {
     public class Program
     {
@@ -24,6 +24,8 @@ namespace ExpenseTracker.API
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<IEntryService, EntrySevice>();
             builder.Services.AddScoped<IEntryRepository, EntryRepository>();
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
             // Configure MongoDBSettings from appsettings.json
             builder.Services.Configure<MongoDBSettings>(
@@ -55,7 +57,6 @@ namespace ExpenseTracker.API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
