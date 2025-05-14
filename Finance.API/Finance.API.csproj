@@ -11,9 +11,8 @@
     <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="Interface\User\" />
+    <Folder Include="Interface\" />
   </ItemGroup>
 
 </Project>
