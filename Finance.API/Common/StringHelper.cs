@@ -1,4 +1,4 @@
-public static class StringExtension
+public static class StringHelper
 {
     public static bool IsNullOrEmpty(this string text)
     {

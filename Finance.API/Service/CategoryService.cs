@@ -1,4 +1,5 @@
-﻿using Finance.API.DataService.Interface;
+﻿using Finance.API.Common;
+using Finance.API.DataService.Interface;
 using Finance.API.Domain.Class;
 using Finance.API.Domain.ViewModel;
 using Finance.API.Domain.ViewModel.Request;
@@ -18,7 +19,7 @@ namespace Finance.API.Service
         public async Task<bool> Upsert(UpsertCategoryRequestVM request)
         {
             Category entity = new Category(request);
-            entity.CreatedDate = DateTime.Now;
+            entity.CreatedDate = DateHelper.GetDateTimePH();
 
             return await _categoryRepo.Upsert(entity);
         }

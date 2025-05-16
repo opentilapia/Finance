@@ -16,7 +16,6 @@ namespace Finance.API.Domain.Class
         {
             CategoryName = request.CategoryName;
             ColorCoding = request.ColorCoding;
-            CreatedDate = DateTime.Now;
         }
 
         [BsonId]

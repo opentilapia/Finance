@@ -1,4 +1,5 @@
-﻿using Finance.API.DataService.Interface;
+﻿using Finance.API.Common;
+using Finance.API.DataService.Interface;
 using Finance.API.Domain.Class;
 using Finance.API.Domain.ViewModel;
 using Finance.API.Domain.ViewModel.Request;
@@ -34,7 +35,7 @@ namespace Finance.API.Service
             }
 
             Entry entity = new Entry(request);
-            entity.CreatedDate = DateTime.Now;
+            entity.CreatedDate = DateHelper.GetDateTimePH();
 
             return await _repo.Upsert(entity);
         }

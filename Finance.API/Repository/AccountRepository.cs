@@ -1,10 +1,11 @@
-﻿using Finance.API.DataService.Interface;
+﻿using Finance.API.Common;
+using Finance.API.DataService.Interface;
 using MongoDB.Driver;
-using CurrentClass = Finance.API.Domain.Class.Account;
+using Entity = Finance.API.Domain.Class.Account;
 
 namespace Finance.API.DataService
 {
-    public class AccountRepository : BaseMongoDbRepository<CurrentClass>, IAccountRepository
+    public class AccountRepository : BaseMongoDbRepository<Entity>, IAccountRepository
     {
         private const string COLLECTION_NAME = "account";
 
@@ -13,33 +14,29 @@ namespace Finance.API.DataService
         {
         }
 
-        public async Task<CurrentClass> GetById(string id)
+        public async Task<Entity> GetById(string id)
         {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
+            var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
 
-            return await _collection
-                .Find(filter)
-                .FirstOrDefaultAsync();
+            return await FindOne(filter);
         }
-        public async Task<List<CurrentClass>> GetAll()
+        public async Task<List<Entity>> GetAll()
         {
-            var filter = Builders<CurrentClass>.Filter.Empty;
+            var filter = Builders<Entity>.Filter.Empty;
 
-            return await _collection
-                .Find(filter)
-                .ToListAsync();
+            return await FindMany(filter);
         }
 
-        public async Task<bool> Upsert(CurrentClass entity)
+        public async Task<bool> Upsert(Entity entity)
         {
             if (entity.Id == null)
                 entity.Id = GetPKId();
 
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, entity.Id);
+            var filter = Builders<Entity>.Filter.Eq(s => s.Id, entity.Id);
 
-            DateTime currDate = DateTime.Now;
+            DateTime currDate = DateHelper.GetDateTimePH();
 
-            var update = Builders<CurrentClass>.Update
+            var update = Builders<Entity>.Update
                 .Set(s => s.Name, entity.Name)
                 .Set(s => s.CurrentFunds, entity.CurrentFunds)
                 .Set(s => s.GrossInterestRate, entity.GrossInterestRate)
@@ -52,16 +49,14 @@ namespace Finance.API.DataService
                 IsUpsert = true,
             };
 
-            await _collection.UpdateOneAsync(filter, update, updateOptions);
-            return true;
+            return await Update(filter, update, updateOptions);
         }
 
         public async Task<bool> Delete(string id)
         {
-            var filter = Builders<CurrentClass>.Filter.Eq(s => s.Id, id);
-            await _collection.DeleteOneAsync(filter);
+            var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
 
-            return true;
+            return await DeleteOne(filter);
         }
     }
 }

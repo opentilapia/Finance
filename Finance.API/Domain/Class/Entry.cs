@@ -12,9 +12,7 @@ namespace Finance.API.Domain.Class
             Amount = request.Amount;
             Description = request.Description;
             Remarks = request.Remarks;
-
-            ObjectId.TryParse(request.CategoryId, out ObjectId categoryId);
-            CategoryId = categoryId;
+            CategoryId = request.CategoryId;
         }
 
         [BsonId]
@@ -24,7 +22,7 @@ namespace Finance.API.Domain.Class
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public string Remarks { get; set; }
-        public ObjectId CategoryId { get; set; }
+        public string CategoryId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime LastUpdatedDate { get; set; }
     }
