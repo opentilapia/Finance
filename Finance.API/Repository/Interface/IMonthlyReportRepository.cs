@@ -7,6 +7,7 @@ namespace Finance.API.Repository.Interface
         Task<List<MonthlyReport>> GetPaginated(int pageSize, DateTime lastMonthEntry);
         Task<bool> Insert(MonthlyReport entity);
         Task<MonthlyReport> GetById(string id);
+        Task<MonthlyReport> GetByMonth(DateTime month);
         Task<bool> UpdateByComputation(MonthlyReport entity);
         Task<bool> UpdateBasicDetails(string id, decimal totalFunds, string remarks);
     }

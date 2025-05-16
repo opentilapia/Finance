@@ -6,16 +6,16 @@ namespace Finance.API.Domain.Class
 {
     public class MonthlyReport
     {
-        //public MonthlyReport(UpsertEntryRequestVM request)
-        //{
-        //    EntryDate = request.EntryDate;
-        //    Amount = request.Amount;
-        //    Description = request.Description;
-        //    Remarks = request.Remarks;
+        public MonthlyReport() 
+        {
 
-        //    ObjectId.TryParse(request.CategoryId, out ObjectId categoryId);
-        //    CategoryId = categoryId;
-        //}
+        }
+        
+        public MonthlyReport(UpdateMonthlyReportBasicDetailsRequestVM request)
+        {
+           TotalFunds = request.TotalFunds;
+           Remarks = request.Remarks;
+        }
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

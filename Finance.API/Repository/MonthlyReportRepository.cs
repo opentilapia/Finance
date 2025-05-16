@@ -24,7 +24,8 @@ namespace Finance.API.DataService
         public async Task<bool> Insert(Entity entity)
         {
             entity.Id = GetPKId();
-
+            entity.CreatedDate = DateHelper.GetDateTimePH();
+            
             return await InsertOne(entity);
         }
 
@@ -46,6 +47,13 @@ namespace Finance.API.DataService
         public async Task<Entity> GetById(string id)
         {
             var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
+
+            return await FindOne(filter);
+        }
+
+        public async Task<Entity> GetByMonth(DateTime month)
+        {
+            var filter = Builders<Entity>.Filter.Eq(s => s.Month, month);
 
             return await FindOne(filter);
         }

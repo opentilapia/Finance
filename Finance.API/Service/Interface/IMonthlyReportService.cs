@@ -6,8 +6,9 @@ namespace Finance.API.Service.Interface
 {
     public interface IMonthlyReportService
     {
-        public Task<List<MonthlyReportVM>> GetPaginated(int pageSize, DateTime? lastMonthEntry);
-        public Task<bool> Compute(string id);
-        public Task<bool> UpdateBasicDetails(UpdateMonthlyReportBasicDetailsRequestVM request);
+        Task<List<MonthlyReportVM>> GetPaginated(DateTime? lastMonthEntry);
+        Task<bool> Compute();
+        Task<bool> Recompute(string id);
+        Task<bool> UpdateBasicDetails(UpdateMonthlyReportBasicDetailsRequestVM request);
     }
 }
