@@ -1,5 +1,9 @@
+using Finance.API.Common;
+using Finance.API.Common.Interface;
 using Finance.API.DataService;
 using Finance.API.DataService.Interface;
+using Finance.API.Domain.Class;
+using Finance.API.Repository;
 using Finance.API.Repository.Interface;
 using Finance.API.Service;
 using Finance.API.Service.Interface;
@@ -29,6 +33,11 @@ namespace Finance.API
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<IMonthlyReportService, MonthlyReportService>();
             builder.Services.AddScoped<IMonthlyReportRepository, MonthlyReportRepository>();
+            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
+            builder.Services.AddScoped<IFileParser<Entry>, XlsFileParser<Entry>>();
+            builder.Services.AddScoped<IRowMapper<Entry>, EntryRowMapper>();
 
             // Configure MongoDBSettings from appsettings.json
             builder.Services.Configure<MongoDBSettings>(

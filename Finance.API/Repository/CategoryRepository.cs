@@ -7,7 +7,7 @@ namespace Finance.API.DataService
 {
     public class CategoryRepository : BaseMongoDbRepository<Entity>, ICategoryRepository
     {
-        private const string COLLECTION_NAME = "category";
+        private const string COLLECTION_NAME = "categories";
 
         public CategoryRepository(IMongoDatabase db)
             : base(db, COLLECTION_NAME)

@@ -7,7 +7,7 @@ namespace Finance.API.DataService
 {
     public class EntryRepository : BaseMongoDbRepository<Entity>, IEntryRepository
     {
-        private const string COLLECTION_NAME = "entry";
+        private const string COLLECTION_NAME = "entries";
 
         public EntryRepository(IMongoDatabase db) 
             :base(db, COLLECTION_NAME)
@@ -28,9 +28,11 @@ namespace Finance.API.DataService
             return await FindMany(filter);
         }
 
-        public async Task<List<Entity>> GetPaginated(int pageSize, DateTime lastEntryDate)
+        public async Task<List<Entity>> GetPaginated(string categoryId, int pageSize, DateTime lastEntryDate)
         {
-            var filter = Builders<Entity>.Filter.Gte(s => s.EntryDate, lastEntryDate);
+            var filter = Builders<Entity>.Filter.Lt(s => s.EntryDate, lastEntryDate) &
+                Builders<Entity>.Filter.Eq(s => s.CategoryId, categoryId);
+
             var sort = Builders<Entity>.Sort.Descending(s => s.EntryDate);
 
             return await FindMany(filter, sort: sort, limit: pageSize);
@@ -67,6 +69,13 @@ namespace Finance.API.DataService
             var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
 
             return await DeleteOne(filter);
+        }
+
+        public async Task<bool> BatchInsert(List<Entity> entities)
+        {
+            entities.ForEach(s => s.Id = GetPKId());
+
+            return await InsertMany(entities);
         }
     }
 }

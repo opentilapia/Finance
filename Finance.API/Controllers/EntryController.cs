@@ -31,12 +31,12 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpGet("paginate")]
-        public async Task<IActionResult> GetPaginated(DateTime? lastEntryDate)
+        [HttpGet("Paginate")]
+        public async Task<IActionResult> GetPaginated(string categoryId, DateTime? lastEntryDate)
         {
             try
             {
-                var result = await _service.GetPaginated(lastEntryDate);
+                var result = await _service.GetPaginated(categoryId, lastEntryDate);
                 return SendSuccess(result);
             }
             catch (Exception e)
@@ -45,7 +45,7 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpDelete]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -59,12 +59,27 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpGet]
         public async Task<IActionResult> GetById(string id)
         {
             try
             {
                 var result = await _service.GetById(id);
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
+        }
+
+
+        [HttpPost("Import")]
+        public async Task<IActionResult> Import([FromForm] string categoryId, [FromForm] IFormFile file)
+        {
+            try
+            {
+                var result = await _service.Import(categoryId, file);
                 return SendSuccess(result);
             }
             catch (Exception e)

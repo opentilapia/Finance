@@ -1,5 +1,4 @@
 ﻿using Finance.API.Domain.Class;
-using Finance.API.Domain.Enum;
 
 namespace Finance.API.Domain.ViewModel
 {
@@ -32,7 +31,17 @@ namespace Finance.API.Domain.ViewModel
 
         public class MonthlyCategoryEntryVM
         {
+            public MonthlyCategoryEntryVM(string categoryId, string categoryName, decimal total)
+            {
+                CategoryId = categoryId;
+                CategoryName = categoryName;
+                Total = total;
+
+            }
+
             public string CategoryId { get; set; }
+
+            public string CategoryName { get; set; }
 
             public decimal Total { get; set; }
 

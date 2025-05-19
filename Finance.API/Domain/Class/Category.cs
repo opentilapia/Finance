@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Finance.API.Domain.Class
 {
-    public class Category
+    public class Category : BaseEntity
     {
         public Category()
         {
@@ -19,18 +19,11 @@ namespace Finance.API.Domain.Class
             Action = request.Action;
         }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
         public string CategoryName { get; set; }
 
         public string ColorCoding { get; set; }
         
         public CategoryActionEnum Action { get; set; }
 
-        public DateTime CreatedDate { get; set; }
-
-        public DateTime LastUpdatedDate { get; set; }
     }
 }

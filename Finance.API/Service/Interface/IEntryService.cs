@@ -8,7 +8,8 @@ namespace Finance.API.Service.Interface
     {
         Task<bool> Upsert(UpsertEntryRequestVM entity);
         Task<EntryVM> GetById(string id);
-        Task<List<EntryVM>> GetPaginated(DateTime? lastEntryDate);
+        Task<List<EntryVM>> GetPaginated(string categoryId, DateTime? lastEntryDate);
         Task<bool> Delete(string id);
+        Task<bool> Import(string categoryId, IFormFile file);
     }
 }

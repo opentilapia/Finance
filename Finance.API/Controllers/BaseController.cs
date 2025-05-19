@@ -6,7 +6,16 @@ namespace Finance.API.Controllers
     {
         public IActionResult SendSuccess(object? response = null)
         {
-            return Ok(response);
+            if (response is null or (object)true)
+            {
+                return Ok(new { message = "Success" });
+            }
+
+            return Ok(new 
+            { 
+                message = "Success",
+                data = response
+            });
         }
 
         public IActionResult SendError(Exception e)
@@ -14,7 +23,8 @@ namespace Finance.API.Controllers
             var errorResponse = new
             {
                 message = "An error has occured",
-                details = e.Message
+                details = e.Message,
+                stack = e.StackTrace
             };
             return StatusCode(500, errorResponse);
         }

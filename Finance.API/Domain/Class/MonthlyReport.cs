@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Finance.API.Domain.Class
 {
-    public class MonthlyReport
+    public class MonthlyReport : BaseEntity
     {
         public MonthlyReport() 
         {
@@ -17,15 +17,9 @@ namespace Finance.API.Domain.Class
            Remarks = request.Remarks;
         }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         public DateTime Month { get; set; }
         public decimal TotalFunds { get; set; }
         public string Remarks { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime LastUpdatedDate { get; set; }
-
 
         // Computed server side
         public decimal SavingsPercent { get; set; }

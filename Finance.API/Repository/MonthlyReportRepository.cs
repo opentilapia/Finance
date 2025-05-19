@@ -7,7 +7,7 @@ namespace Finance.API.DataService
 {
     public class MonthlyReportRepository : BaseMongoDbRepository<Entity>, IMonthlyReportRepository
     {
-        private const string COLLECTION_NAME = "monthly_report";
+        private const string COLLECTION_NAME = "monthly_reports";
 
         public MonthlyReportRepository(IMongoDatabase db) 
             :base(db, COLLECTION_NAME)
@@ -16,7 +16,8 @@ namespace Finance.API.DataService
 
         public async Task<List<Entity>> GetPaginated(int pageSize, DateTime lastMontEntry)
         {
-            var filter = Builders<Entity>.Filter.Gte(s => s.Month, lastMontEntry);
+            var filter = Builders<Entity>.Filter.Lt(s => s.Month, lastMontEntry);
+
             var sort = Builders<Entity>.Sort.Descending(s => s.Month);
 
             return await FindMany(filter, sort: sort, limit: pageSize);

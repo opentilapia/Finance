@@ -6,6 +6,7 @@ using Finance.API.Domain.ViewModel;
 using Finance.API.Domain.ViewModel.Request;
 using Finance.API.Repository.Interface;
 using Finance.API.Service.Interface;
+using static Finance.API.Domain.ViewModel.MonthlyReportVM;
 
 namespace Finance.API.Service
 {
@@ -27,16 +28,29 @@ namespace Finance.API.Service
         public async Task<List<MonthlyReportVM>> GetPaginated(DateTime? lastMonthEntry)
         {
             if (!lastMonthEntry.HasValue)
-            {
-                lastMonthEntry = DateTime.MinValue;
-            }
+                lastMonthEntry = DateTime.MaxValue;
 
             List<MonthlyReport> sources = await _monthlyReportRepo.GetPaginated(PAGE_SIZE, lastMonthEntry.Value);
             List<MonthlyReportVM> result = new List<MonthlyReportVM>();
 
+            List<Category> categoryList = await _categoryRepo.GetAll();
+            Dictionary<string, string> categoryDict = categoryList.ToDictionary(s => s.Id, s => s.CategoryName);
+
             foreach (MonthlyReport entity in sources)
             {
-                result.Add(new MonthlyReportVM(entity));
+                MonthlyReportVM vm = new MonthlyReportVM(entity);
+                vm.MonthlyCategoryEntries = new List<MonthlyCategoryEntryVM>();
+
+                foreach (MonthlyReport.MonthlyCategoryEntry totals in entity.MonthlyCategoryEntries)
+                {
+                    if (!categoryDict.TryGetValue(totals.CategoryId, out string? categoryName))
+                        categoryName = "DELETED CATEGORY";
+
+                    vm.MonthlyCategoryEntries.Add(new MonthlyCategoryEntryVM(totals.CategoryId, categoryName, totals.Total));
+
+                }
+
+                result.Add(vm);
             }
 
             return result;
@@ -46,19 +60,21 @@ namespace Finance.API.Service
         {
             DateTime currDate = DateHelper.GetDateTimePH();
             DateTime startDate = currDate.GetStartOfMonth();
-            DateTime endDate = currDate.GetEndOfMonth(); 
+            DateTime endDate = currDate.GetEndOfMonth();
 
             MonthlyReport entity = await _monthlyReportRepo.GetByMonth(startDate);
 
-            if (entity == null)
+            if (entity != null)
             {
-                entity = new MonthlyReport();
-                entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
-                entity.Month = startDate;
+                throw new ApplicationException("Monthly report already exist. Please use recompute endpoint.");
             }
-            
+
+            entity = new MonthlyReport();
+            entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
+            entity.Month = startDate;
+
             entity = await compute(entity, startDate, endDate);
-            Console.WriteLine(entity.Month);
+
             return await _monthlyReportRepo.Insert(entity);
         }
 
@@ -94,12 +110,14 @@ namespace Finance.API.Service
             List<Category> categoryList = await _categoryRepo.GetAll();
             Dictionary<string, Category> categoryDict = categoryList.ToDictionary(s => s.Id, s => s);
 
+            entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
+
             foreach (KeyValuePair<string, decimal> keyVal in categoryIdAmountDict)
             {
                 string categoryId = keyVal.Key;
                 decimal entryAmount = keyVal.Value;
 
-                if (!categoryDict.TryGetValue(categoryId, out Category category))
+                if (!categoryDict.TryGetValue(categoryId, out Category? category))
                     continue;
 
                 switch (category.Action)
@@ -121,7 +139,14 @@ namespace Finance.API.Service
 
         public async Task<bool> UpdateBasicDetails(UpdateMonthlyReportBasicDetailsRequestVM request)
         {
-            throw new NotImplementedException();
+            MonthlyReport entity = await _monthlyReportRepo.GetById(request.Id);
+
+            if (entity == null)
+            {
+                throw new ApplicationException("Monthly report not found.");
+            }
+
+            return await _monthlyReportRepo.UpdateBasicDetails(request.Id, request.TotalFunds, request.Remarks);
         }
 
 

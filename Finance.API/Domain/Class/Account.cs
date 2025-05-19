@@ -6,7 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Finance.API.Domain.Class
 {
-    public class Account
+    public class Account : BaseEntity
     {
         public Account(UpsertAccountRequestVM entity)
         {
@@ -16,9 +16,6 @@ namespace Finance.API.Domain.Class
             Type = entity.Type.Value;
         }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         public string Name { get;set; }
         public decimal CurrentFunds { get;set; }
 
@@ -27,7 +24,5 @@ namespace Finance.API.Domain.Class
         /// </summary>
         public decimal GrossInterestRate { get; set; }
         public AccountTypeEnum Type { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime LastUpdatedDate { get; set; }
     }
 }

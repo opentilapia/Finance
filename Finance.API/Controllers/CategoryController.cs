@@ -29,7 +29,7 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpGet("all")]
+        [HttpGet("All")]
         public async Task<IActionResult> GetAll()
         {
             try

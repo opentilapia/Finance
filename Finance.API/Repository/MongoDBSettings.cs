@@ -1,4 +1,4 @@
-﻿namespace Finance.API.DataService
+﻿namespace Finance.API.Repository
 {
     public class MongoDBSettings
     {

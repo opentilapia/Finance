@@ -17,71 +17,136 @@ public class BaseMongoDbRepository<T> : IBaseRepository where T : class
             .ToString();
     }
 
-    public async Task<bool> IsExist(FilterDefinition<T> filter)
+    protected async Task<bool> IsExist(FilterDefinition<T> filter)
     {
         return await _collection.CountDocumentsAsync(filter) > 0;
     }
 
-    public async Task<bool> Update(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions? updateOptions = null)
+    protected async Task<bool> Update(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions? updateOptions = null)
     {
         var result = await _collection.UpdateManyAsync(filter, update, updateOptions);
 
-        return result.ModifiedCount > 0;
+        if (result.IsAcknowledged)
+        {
+            if (result.UpsertedId != null)
+            {
+                return true;
+            }
+
+            return result.ModifiedCount > 0;
+        }
+
+        return false;
     }
 
-    public async Task<bool> InsertOne(T entity)
+    protected async Task<bool> InsertOne(T entity)
     {
         await _collection.InsertOneAsync(entity);
         return true;
     }
 
-    public async Task<bool> DeleteOne(FilterDefinition<T> filter)
+    protected async Task<bool> InsertMany(List<T> entities)
+    {
+        await _collection.InsertManyAsync(entities);
+
+        return true;
+    }
+    protected async Task<bool> DeleteOne(FilterDefinition<T> filter)
     {
         var result = await _collection.DeleteOneAsync(filter);
 
-        return result.DeletedCount > 0;
+        if (result.IsAcknowledged)
+        {
+            return result.DeletedCount > 0;
+        }
+
+        return false;
     }
 
-    public async Task<bool> DeleteMany(FilterDefinition<T> filter)
+    protected async Task<bool> DeleteMany(FilterDefinition<T> filter)
     {
         var result = await _collection.DeleteManyAsync(filter);
 
-        return result.DeletedCount > 0;
+        if (result.IsAcknowledged)
+        {
+            return result.DeletedCount > 0;
+        }
+
+        return false;
     }
 
-    public async Task<List<T>> FindMany(FilterDefinition<T> filter, ProjectionDefinition<T>? projection = null, SortDefinition<T>? sort = null, int limit = 0)
+    protected async Task<List<T>> FindMany(FilterDefinition<T> filter, ProjectionDefinition<T>? projection = null, SortDefinition<T>? sort = null, int limit = 0)
     {
         var result = baseFind(filter, projection, sort, limit);
 
         if (result == null)
             return new List<T>();
 
-        return await result.ToListAsync();
+        var finalResult = await result.ToListAsync();
+
+        foreach (T entity in finalResult)
+        {
+            ConvertDateTimesToManila(entity);
+        }
+
+        return finalResult;
     }
 
-    public async Task<T> FindOne(FilterDefinition<T> filter, ProjectionDefinition<T>? projection = null, SortDefinition<T>? sort = null, int limit = 0)
+    protected async Task<T> FindOne(FilterDefinition<T> filter, ProjectionDefinition<T>? projection = null, SortDefinition<T>? sort = null, int limit = 0)
     {
         var result = baseFind(filter, projection, sort, limit);
 
         if (result == null)
             return null;
 
-        return await result.FirstOrDefaultAsync();
+        var entity = await result.FirstOrDefaultAsync();
+
+        ConvertDateTimesToManila(entity);
+
+        return entity;
     }
 
     private FindFluentBase<T, T> baseFind(FilterDefinition<T> filter, ProjectionDefinition<T>? projection = null, SortDefinition<T>? sort = null, int limit = 0)
     {
-        var result = _collection.Find(filter);
+        var query = _collection.Find(filter);
 
         if (projection != null)
-            result = result.Project<T>(projection);
+            query = query.Project<T>(projection);
 
         if (sort != null)
-            result = result.Sort(sort);
+            query = query.Sort(sort);
 
         if (limit > 0)
-            result = result.Limit(limit);
+            query = query.Limit(limit);
 
-        return (FindFluentBase<T, T>)result;
+        return (FindFluentBase<T, T>)query;
+    }
+
+    // Helper method to convert all DateTime properties from UTC to Manila time
+    private void ConvertDateTimesToManila(T entity)
+    {
+        if (entity == null)
+            return;
+
+        var manilaTz = TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila");
+
+        var dateTimeProperties = typeof(T).GetProperties()
+            .Where(p => p.PropertyType == typeof(DateTime) && p.CanRead && p.CanWrite);
+
+        foreach (var prop in dateTimeProperties)
+        {
+            var utcValue = (DateTime)prop.GetValue(entity);
+
+            if (utcValue == DateTime.MinValue)
+                continue;
+
+            DateTime utcDateTime = utcValue.Kind == DateTimeKind.Utc
+                ? utcValue
+                : DateTime.SpecifyKind(utcValue, DateTimeKind.Utc);
+
+            var manilaDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, manilaTz);
+
+            prop.SetValue(entity, manilaDateTime);
+        }
     }
 }

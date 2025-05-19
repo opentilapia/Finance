@@ -7,10 +7,9 @@ namespace Finance.API.Common
     {
         public static DateTime GetDateTimePH()
         {
-            // Set kind to Unspecified so Mongo doesn't treat it as UTC
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,
-    TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila")); ;
-
+            // Get Manila timezone info
+            var manilaTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Asia/Manila"));
+            return new DateTime(manilaTime.Ticks, DateTimeKind.Unspecified);
         }
 
         public static DateTime GetStartOfDay(this DateTime dateTime)

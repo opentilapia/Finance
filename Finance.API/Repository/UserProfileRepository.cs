@@ -1,15 +1,16 @@
 ﻿using Finance.API.Common;
 using Finance.API.DataService.Interface;
+using Finance.API.Domain.Class;
 using MongoDB.Driver;
-using Entity = Finance.API.Domain.Class.Account;
+using Entity = Finance.API.Domain.Class.UserProfile;
 
 namespace Finance.API.DataService
 {
-    public class AccountRepository : BaseMongoDbRepository<Entity>, IAccountRepository
+    public class UserProfileRepository : BaseMongoDbRepository<Entity>, IUserProfileRepository
     {
-        private const string COLLECTION_NAME = "accounts";
+        private const string COLLECTION_NAME = "user_profiles";
 
-        public AccountRepository(IMongoDatabase db) 
+        public UserProfileRepository(IMongoDatabase db) 
             :base(db, COLLECTION_NAME)
         {
         }
@@ -19,12 +20,6 @@ namespace Finance.API.DataService
             var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
 
             return await FindOne(filter);
-        }
-        public async Task<List<Entity>> GetAll()
-        {
-            var filter = Builders<Entity>.Filter.Empty;
-
-            return await FindMany(filter);
         }
 
         public async Task<bool> Upsert(Entity entity)
@@ -37,10 +32,11 @@ namespace Finance.API.DataService
             DateTime currDate = DateHelper.GetDateTimePH();
 
             var update = Builders<Entity>.Update
-                .Set(s => s.Name, entity.Name)
-                .Set(s => s.CurrentFunds, entity.CurrentFunds)
-                .Set(s => s.GrossInterestRate, entity.GrossInterestRate)
-                .Set(s => s.Type, entity.Type)
+                .Set(s => s.Nickname, entity.Nickname)
+                .Set(s => s.CurrentGrossSalary, entity.CurrentGrossSalary)
+                .Set(s => s.CurrentNetSalary, entity.CurrentNetSalary)
+                .Set(s => s.TargetSavingsPercent, entity.TargetSavingsPercent)
+                .Set(s => s.CreditLimit, entity.CreditLimit)
                 .Set(s => s.LastUpdatedDate, currDate)
                 .SetOnInsert(s => s.CreatedDate, currDate);
 
@@ -49,14 +45,7 @@ namespace Finance.API.DataService
                 IsUpsert = true,
             };
 
-            return await Update(filter, update, updateOptions);
-        }
-
-        public async Task<bool> Delete(string id)
-        {
-            var filter = Builders<Entity>.Filter.Eq(s => s.Id, id);
-
-            return await DeleteOne(filter);
+            return await Update(filter, update, updateOptions); 
         }
     }
 }

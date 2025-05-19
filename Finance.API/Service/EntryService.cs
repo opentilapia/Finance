@@ -1,4 +1,5 @@
 ﻿using Finance.API.Common;
+using Finance.API.Common.Interface;
 using Finance.API.DataService.Interface;
 using Finance.API.Domain.Class;
 using Finance.API.Domain.ViewModel;
@@ -11,13 +12,15 @@ namespace Finance.API.Service
     {
         private readonly IEntryRepository _repo;
         private readonly ICategoryRepository _categoryRepo;
+        private readonly IFileParser<Entry> _fileParser;
 
         const int PAGE_SIZE = 10;
 
-        public EntrySevice(IEntryRepository repo, ICategoryRepository categoryRepo)
+        public EntrySevice(IEntryRepository repo, ICategoryRepository categoryRepo, IFileParser<Entry> fileParser)
         {
             _repo = repo;
             _categoryRepo = categoryRepo;
+            _fileParser = fileParser;
         }
 
         public async Task<bool> Upsert(UpsertEntryRequestVM request)
@@ -52,14 +55,12 @@ namespace Finance.API.Service
             return new EntryVM(entity);
         }
 
-        public async Task<List<EntryVM>> GetPaginated(DateTime? lastEntryDate)
+        public async Task<List<EntryVM>> GetPaginated(string categoryId, DateTime? lastEntryDate)
         {
             if (!lastEntryDate.HasValue)
-            {
-                lastEntryDate = DateTime.MinValue;
-            }
+                lastEntryDate = DateTime.MaxValue;
 
-            List<Entry> sources = await _repo.GetPaginated(PAGE_SIZE, lastEntryDate.Value);
+            List<Entry> sources = await _repo.GetPaginated(categoryId, PAGE_SIZE, lastEntryDate.Value);
             List<EntryVM> result = new List<EntryVM>();
             
             foreach (Entry entity in sources)
@@ -73,6 +74,30 @@ namespace Finance.API.Service
         public async Task<bool> Delete(string id)
         {
             return await _repo.Delete(id);
+        }
+
+        public async Task<bool> Import(string categoryId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ApplicationException("File is required");
+            }
+
+            if(!await _categoryRepo.IsExistById(categoryId))
+            {
+                throw new ApplicationException("Category not found.");
+            }
+
+            List<Entry> entities = await _fileParser.Parse(file);
+
+            if (entities.Count == 0)
+            {
+                throw new ApplicationException("No lines found.");
+            }
+
+            entities.ForEach(s => s.CategoryId = categoryId); 
+
+            return await _repo.BatchInsert(entities);
         }
     }
 }

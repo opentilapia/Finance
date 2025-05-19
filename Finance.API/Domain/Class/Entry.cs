@@ -4,8 +4,10 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Finance.API.Domain.Class
 {
-    public class Entry
+    public class Entry : BaseEntity
     {
+        public Entry() { }
+
         public Entry(UpsertEntryRequestVM request)
         {
             EntryDate = request.EntryDate;
@@ -15,15 +17,12 @@ namespace Finance.API.Domain.Class
             CategoryId = request.CategoryId;
         }
 
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         public DateTime EntryDate { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public string Remarks { get; set; }
+
+        [BsonRepresentation(BsonType.ObjectId)]
         public string CategoryId { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime LastUpdatedDate { get; set; }
     }
 }
