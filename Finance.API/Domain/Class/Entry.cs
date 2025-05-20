@@ -12,14 +12,12 @@ namespace Finance.API.Domain.Class
         {
             EntryDate = request.EntryDate;
             Amount = request.Amount;
-            Description = request.Description;
             Remarks = request.Remarks;
             CategoryId = request.CategoryId;
         }
 
         public DateTime EntryDate { get; set; }
         public decimal Amount { get; set; }
-        public string Description { get; set; }
         public string Remarks { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]

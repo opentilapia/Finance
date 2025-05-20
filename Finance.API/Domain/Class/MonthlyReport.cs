@@ -22,8 +22,26 @@ namespace Finance.API.Domain.Class
         public string Remarks { get; set; }
 
         // Computed server side
-        public decimal SavingsPercent { get; set; }
-        public decimal Remaining { get; set; }
+
+        /// <summary>
+        /// SavedAmount / CurrentNetSalary
+        /// </summary>
+        public decimal SavedPercent { get; set; }
+
+        /// <summary>
+        /// Total In - Total Out
+        /// </summary>
+        public decimal SavedAmount { get; set; }
+
+        /// <summary>
+        /// CurrentNetSalary - (Limit + Total Out)
+        /// </summary>
+        public decimal RemainingAmount { get; set; }
+
+        /// <summary>
+        /// CurrentNetSalary - Total Out
+        /// </summary>
+        public decimal SavedFromSalary { get; set; }
         public decimal TotalIn { get; set; }
         public decimal TotalOut { get; set; }
         public List<MonthlyCategoryEntry> MonthlyCategoryEntries { get; set; }

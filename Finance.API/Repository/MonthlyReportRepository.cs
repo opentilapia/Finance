@@ -37,8 +37,8 @@ namespace Finance.API.DataService
             var update = Builders<Entity>.Update
                 .Set(s => s.TotalIn, entity.TotalIn)
                 .Set(s => s.TotalOut, entity.TotalOut)
-                .Set(s => s.Remaining, entity.Remaining)
-                .Set(s => s.SavingsPercent, entity.SavingsPercent)
+                .Set(s => s.RemainingAmount, entity.RemainingAmount)
+                .Set(s => s.SavedPercent, entity.SavedPercent)
                 .Set(s => s.MonthlyCategoryEntries, entity.MonthlyCategoryEntries)
                 .Set(s => s.LastUpdatedDate, DateHelper.GetDateTimePH());
 
@@ -54,7 +54,8 @@ namespace Finance.API.DataService
 
         public async Task<Entity> GetByMonth(DateTime month)
         {
-            var filter = Builders<Entity>.Filter.Eq(s => s.Month, month);
+            var filter = Builders<Entity>.Filter.Gte(s => s.Month, month)
+                & Builders<Entity>.Filter.Lte(s => s.Month, month);
 
             return await FindOne(filter);
         }

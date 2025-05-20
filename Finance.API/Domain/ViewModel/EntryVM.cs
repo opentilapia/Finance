@@ -9,7 +9,6 @@ namespace Finance.API.Domain.ViewModel
             Id = entity.Id.ToString();
             EntryDate = entity.EntryDate;
             Amount = entity.Amount;
-            Description = entity.Description;
             Remarks = entity.Remarks;
             CategoryId = entity.CategoryId.ToString();
         }
@@ -17,7 +16,6 @@ namespace Finance.API.Domain.ViewModel
         public string Id { get; set; }
         public DateTime EntryDate { get; set; }
         public decimal Amount { get; set; }
-        public string Description { get; set; }
         public string Remarks { get; set; }
         public string CategoryId { get; set; }
     }

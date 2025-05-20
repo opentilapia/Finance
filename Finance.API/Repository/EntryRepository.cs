@@ -50,7 +50,6 @@ namespace Finance.API.DataService
             var update = Builders<Entity>.Update
                 .Set(s => s.EntryDate, entity.EntryDate)
                 .Set(s => s.Amount, entity.Amount)
-                .Set(s => s.Description, entity.Description)
                 .Set(s => s.Remarks, entity.Remarks)
                 .Set(s => s.CategoryId, entity.CategoryId)
                 .Set(s => s.LastUpdatedDate, currDate)

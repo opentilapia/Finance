@@ -38,7 +38,7 @@ namespace Finance.API.DataService
 
             var update = Builders<Entity>.Update
                 .Set(s => s.Name, entity.Name)
-                .Set(s => s.CurrentFunds, entity.CurrentFunds)
+                .Set(s => s.Amount, entity.Amount)
                 .Set(s => s.GrossInterestRate, entity.GrossInterestRate)
                 .Set(s => s.Type, entity.Type)
                 .Set(s => s.LastUpdatedDate, currDate)

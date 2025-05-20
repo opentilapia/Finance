@@ -1,4 +1,5 @@
 ﻿using Finance.API.Common;
+using Finance.API.Common.Constant;
 using Finance.API.DataService.Interface;
 using Finance.API.Domain.Class;
 using Finance.API.Domain.Enum;
@@ -15,14 +16,20 @@ namespace Finance.API.Service
         private readonly IMonthlyReportRepository _monthlyReportRepo;
         private readonly IEntryRepository _entryRepo;
         private readonly ICategoryRepository _categoryRepo;
+        private readonly IUserProfileRepository _userProfileRepo;
 
         const int PAGE_SIZE = 10;
 
-        public MonthlyReportService(IMonthlyReportRepository repo, IEntryRepository entryRepo, ICategoryRepository categoryRepo)
+        public MonthlyReportService(
+            IMonthlyReportRepository repo, 
+            IEntryRepository entryRepo, 
+            ICategoryRepository categoryRepo,
+            IUserProfileRepository userProfileRepo)
         {
             _monthlyReportRepo = repo;
             _entryRepo = entryRepo;
             _categoryRepo = categoryRepo;
+            _userProfileRepo = userProfileRepo;
         }
 
         public async Task<List<MonthlyReportVM>> GetPaginated(DateTime? lastMonthEntry)
@@ -56,30 +63,58 @@ namespace Finance.API.Service
             return result;
         }
 
-        public async Task<bool> Compute()
+        public async Task<bool> Compute(DateTime? month)
         {
-            DateTime currDate = DateHelper.GetDateTimePH();
-            DateTime startDate = currDate.GetStartOfMonth();
-            DateTime endDate = currDate.GetEndOfMonth();
+            UserProfile userProfile = await _userProfileRepo.GetById(AppConstant.USER_PROFILE_PERSISTENT_ID);
 
-            MonthlyReport entity = await _monthlyReportRepo.GetByMonth(startDate);
-
-            if (entity != null)
+            if (userProfile == null)
             {
-                throw new ApplicationException("Monthly report already exist. Please use recompute endpoint.");
+                throw new ApplicationException("User profile not found.");
+            }
+            else if (userProfile.CurrentNetSalary == 0)
+            {
+                throw new ApplicationException("Net salary of user has not been setup yet.");
             }
 
-            entity = new MonthlyReport();
-            entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
-            entity.Month = startDate;
+            if (!month.HasValue)
+            {
+                month = DateHelper.GetDateTimePH();
+            }
 
-            entity = await compute(entity, startDate, endDate);
+            month = month.Value.GetStartOfMonth();
 
-            return await _monthlyReportRepo.Insert(entity);
+            MonthlyReport entity = await _monthlyReportRepo.GetByMonth(month.Value);
+
+            bool isNew = false;
+
+            if (entity == null)
+            {
+                isNew = true;
+                entity = new MonthlyReport();
+                entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
+                entity.Month = month.Value;
+            }
+
+            entity = await compute(entity, userProfile);
+
+            return isNew 
+                ? await _monthlyReportRepo.Insert(entity)
+                : await _monthlyReportRepo.UpdateByComputation(entity);
         }
 
-        public async Task<bool> Recompute(string id)
+        public async Task<bool> RecomputeById(string id)
         {
+            UserProfile userProfile = await _userProfileRepo.GetById(AppConstant.USER_PROFILE_PERSISTENT_ID);
+
+            if (userProfile == null)
+            {
+                throw new ApplicationException("User profile not found.");
+            }
+            else if(userProfile.CurrentNetSalary == 0)
+            {
+                throw new ApplicationException("Net salary of user has not been setup yet.");
+            }
+
             MonthlyReport entity = await _monthlyReportRepo.GetById(id);
 
             if (entity == null)
@@ -87,32 +122,37 @@ namespace Finance.API.Service
                 throw new ApplicationException("Monthly report not found.");
             }
 
-            entity = await compute(entity,
-                entity.Month.GetStartOfMonth(),
-                entity.Month.GetEndOfMonth());
+            entity = await compute(entity, userProfile);
 
             return await _monthlyReportRepo.UpdateByComputation(entity);
         }
 
-        private async Task<MonthlyReport> compute(MonthlyReport entity, DateTime startDate, DateTime endDate)
+        private async Task<MonthlyReport> compute(MonthlyReport entity, UserProfile userProfile)
         {
-            List<Entry> entryList = await _entryRepo.GetByDateRange(startDate.GetStartOfMonth(), endDate.GetEndOfMonth());
-            Dictionary<string, decimal> categoryIdAmountDict = new Dictionary<string, decimal>();
+            List<Entry> entryList = await _entryRepo
+                .GetByDateRange(entity.Month.GetStartOfMonth(), entity.Month.GetEndOfMonth());
+
+            Dictionary<string, decimal> aggregatedCategoryAmountDict = new Dictionary<string, decimal>();
 
             foreach (Entry entry in entryList)
             {
-                if (categoryIdAmountDict.TryGetValue(entry.CategoryId, out decimal amount))
-                    categoryIdAmountDict[entry.CategoryId] = amount + entry.Amount;
-                else
-                    categoryIdAmountDict.Add(entry.CategoryId, entry.Amount);
+                if (!aggregatedCategoryAmountDict.TryGetValue(entry.CategoryId, out decimal amount))
+                {
+                    aggregatedCategoryAmountDict.Add(entry.CategoryId, entry.Amount);
+                    continue;
+                }
+
+                aggregatedCategoryAmountDict[entry.CategoryId] = amount + entry.Amount;
             }
 
             List<Category> categoryList = await _categoryRepo.GetAll();
             Dictionary<string, Category> categoryDict = categoryList.ToDictionary(s => s.Id, s => s);
 
             entity.MonthlyCategoryEntries = new List<MonthlyReport.MonthlyCategoryEntry>();
+            entity.TotalIn = 0;
+            entity.TotalOut = 0;
 
-            foreach (KeyValuePair<string, decimal> keyVal in categoryIdAmountDict)
+            foreach (KeyValuePair<string, decimal> keyVal in aggregatedCategoryAmountDict)
             {
                 string categoryId = keyVal.Key;
                 decimal entryAmount = keyVal.Value;
@@ -133,6 +173,19 @@ namespace Finance.API.Service
                 entity.MonthlyCategoryEntries.Add(
                     new MonthlyReport.MonthlyCategoryEntry(categoryId, entryAmount));
             }
+
+            entity.SavedAmount = entity.TotalIn - entity.TotalOut;
+
+            if (entity.SavedAmount > 0)
+                entity.SavedPercent = (entity.SavedAmount / userProfile.CurrentNetSalary * 100) * 100;
+
+            decimal savingsLimitAmount = userProfile.CurrentNetSalary * (userProfile.TargetSavingsPercent / 100);
+            entity.RemainingAmount = userProfile.CurrentNetSalary - (savingsLimitAmount + entity.TotalOut);
+           
+            if(entity.RemainingAmount < 0)
+                entity.RemainingAmount = 0;
+
+            entity.SavedFromSalary = userProfile.CurrentNetSalary - entity.TotalOut;
 
             return entity;
         }

@@ -11,13 +11,13 @@ namespace Finance.API.Domain.Class
         public Account(UpsertAccountRequestVM entity)
         {
             Name = entity.Name;
-            CurrentFunds = entity.CurrentFunds.Value;
+            Amount = entity.CurrentFunds.Value;
             GrossInterestRate = entity.GrossInterestRate;
             Type = entity.Type.Value;
         }
 
         public string Name { get;set; }
-        public decimal CurrentFunds { get;set; }
+        public decimal Amount { get;set; }
 
         /// <summary>
         /// Only applicable if Time deposit or HYSA

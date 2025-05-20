@@ -10,8 +10,8 @@ namespace Finance.API.Domain.ViewModel
             Month = entity.Month;
             TotalFunds = entity.TotalFunds;
             Remarks = entity.Remarks;
-            SavingsPercent = entity.SavingsPercent;
-            Remaining = entity.Remaining;
+            SavingsPercent = entity.SavedPercent;
+            Remaining = entity.RemainingAmount;
             TotalIn = entity.TotalIn;
             TotalOut = entity.TotalOut;
         }
@@ -36,7 +36,6 @@ namespace Finance.API.Domain.ViewModel
                 CategoryId = categoryId;
                 CategoryName = categoryName;
                 Total = total;
-
             }
 
             public string CategoryId { get; set; }

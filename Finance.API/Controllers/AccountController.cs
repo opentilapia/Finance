@@ -43,6 +43,20 @@ namespace Finance.API.Controllers
             }
         }
 
+        [HttpGet("Overview")]
+        public async Task<IActionResult> GetOverview()
+        {
+            try
+            {
+                var result = await _service.GetOverview();
+                return SendSuccess(result);
+            }
+            catch (Exception e)
+            {
+                return SendError(e);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetById(string id)
         {

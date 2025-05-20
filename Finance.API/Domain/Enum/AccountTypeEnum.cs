@@ -9,5 +9,6 @@
         Equities = 5,
         Receivables = 6,
         Payables = 7,
+        CreditCardRemaining = 8
     }
 }

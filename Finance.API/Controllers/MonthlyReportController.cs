@@ -9,10 +9,12 @@ namespace Finance.API.Controllers
     public class MonthlyReportController : BaseController
     {
         private readonly IMonthlyReportService _service;
+        private readonly IUserProfileService _userProfileService;
 
-        public MonthlyReportController(IMonthlyReportService service)
+        public MonthlyReportController(IMonthlyReportService service, IUserProfileService userProfileService)
         {
             _service = service;
+            _userProfileService = userProfileService;
         }
 
         [HttpPost]
@@ -44,12 +46,12 @@ namespace Finance.API.Controllers
         }
 
         [HttpPost("Compute")]
-        public async Task<IActionResult> Compute()
+        public async Task<IActionResult> Compute([FromQuery] DateTime? month)
         {
             try
             {
                 
-                var result = await _service.Compute();
+                var result = await _service.Compute(month);
                 return SendSuccess(result);
             }
             catch (Exception e)
@@ -58,12 +60,12 @@ namespace Finance.API.Controllers
             }
         }
 
-        [HttpPost("{id}/Recompute")]
-        public async Task<IActionResult> Recompute(string id)
+        [HttpPost("RecomputeById/{id}")]
+        public async Task<IActionResult> RecomputeById(string id)
         {
             try
             {
-                var result = await _service.Recompute(id);
+                var result = await _service.RecomputeById(id);
                 return SendSuccess(result);
             }
             catch (Exception e)

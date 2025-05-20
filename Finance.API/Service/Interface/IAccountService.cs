@@ -8,6 +8,7 @@ namespace Finance.API.Service.Interface
         Task<bool> Upsert(UpsertAccountRequestVM entity);
         Task<AccountVM> GetById(string id);
         Task<List<AccountVM>> GetAll();
+        Task<AccountOverviewVM> GetOverview();
         Task<bool> Delete(string id);
     }
 }

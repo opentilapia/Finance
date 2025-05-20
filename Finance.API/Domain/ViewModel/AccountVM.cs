@@ -9,7 +9,7 @@ namespace Finance.API.Domain.ViewModel
         { 
             Id = entity.Id;
             Name = entity.Name;
-            CurrentFunds = entity.CurrentFunds;
+            CurrentFunds = entity.Amount;
             GrossInterestRate = entity.GrossInterestRate;
             Type = entity.Type;
             CreatedDate = entity.CreatedDate;
